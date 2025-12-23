@@ -9,6 +9,7 @@ export default function GroupPage() {
   const { groupId } = useParams();
   const [selectedSplitUsers, setSelectedSplitUsers] = useState([]);
   const [splitValues, setSplitValues] = useState({});
+const [groupName, setGroupName] = useState("");
 
   const [members, setMembers] = useState([]);
   const [expenses, setExpenses] = useState([]);
@@ -61,14 +62,16 @@ export default function GroupPage() {
     fetchExpenses();
   }, []);
 
-  const fetchMembers = async () => {
-    try {
-      const res = await api.get(`/groups/${groupId}/members`);
-      setMembers(res.data.members);
-    } catch (error) {
-      toast.error("Failed to fetch members");
-    }
-  };
+ const fetchMembers = async () => {
+  try {
+    const res = await api.get(`/groups/${groupId}/members`);
+    setMembers(res.data.members);
+    setGroupName(res.data.groupName); // 🔥 ADD THIS
+  } catch (error) {
+    toast.error("Failed to fetch members");
+  }
+};
+
 
   const fetchExpenses = async () => {
     try {
@@ -196,9 +199,10 @@ export default function GroupPage() {
               <Users className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Agra Trip
-              </h2>
+             <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+  {groupName || "Loading..."}
+</h2>
+
               <p className="text-gray-400 text-sm">Track expenses with your group</p>
             </div>
           </div>

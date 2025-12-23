@@ -36,9 +36,7 @@ router.get("/my-groups", auth, async (req, res) => {
     const userId = req.user;
 
     // Find groups where the logged-in user is a member
-  
     const groups = await Group.find({ members: userId }).populate("members", "name email");
-
     res.status(200).json(groups);
   } catch (err) {
     console.error(err);
