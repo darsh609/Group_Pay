@@ -16,11 +16,13 @@ The **core of this project is the backend architecture and API design**.
 
   ```
   https://splitwise-clone-assgn-1.onrender.com/api
+  
   ```
 * **Frontend URL**
-```
-https://splitwise-clone-assgn.vercel.app/
-```
+  ```
+   https://splitwise-clone-assgn.vercel.app/
+  
+  ```
   
 
 ---
