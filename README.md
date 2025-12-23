@@ -1,10 +1,3 @@
-got it bro 👍
-below is an **UPDATED README** with a **strong backend-oriented guidance section**.
-No code logic explanation, only **API usage, setup, running steps, and how to test** — exactly what evaluators expect.
-
-You can **replace your README with this**, or merge sections if you want.
-
----
 
 # 💸 Splitwise Clone – Expense Sharing App (Backend Oriented)
 
@@ -269,13 +262,3 @@ NIT Warangal
 
 > This assignment demonstrates my understanding of backend development, API design, authentication, and real-world data handling.
 
----
-
-If you want next:
-
-* 🔥 **API table format (for evaluators)**
-* 🧪 **Postman collection structure**
-* 📄 **Short README for submission portal**
-* 📌 **Resume-ready project description**
-
-just say the word bro 💪
