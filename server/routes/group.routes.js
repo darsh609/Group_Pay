@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Group = require("../models/Group");
 const auth = require("../middleware/auth.middleware");
+ const mongoose = require("mongoose");
+const Expense = require("../models/Expense");
+const Settlement = require("../models/Settlement");
 
 router.post("/", auth, async (req, res) => {
   try {
@@ -73,6 +76,53 @@ router.get("/:groupId/members", auth, async (req, res) => {
     res.status(500).json({ msg: "Failed to fetch group members" });
   }
 });
+
+
+// DELETE a group + related expenses & settlements
+router.delete("/:groupId", auth, async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { groupId } = req.params;
+    const userId = req.user;
+
+    const group = await Group.findById(groupId).session(session);
+
+    if (!group) {
+      await session.abortTransaction();
+      return res.status(404).json({ msg: "Group not found" });
+    }
+
+    // ✅ Authorization: only creator can delete
+    if (group.createdBy.toString() !== userId.toString()) {
+      await session.abortTransaction();
+      return res.status(403).json({ msg: "Only group creator can delete group" });
+    }
+
+    // 🔥 Delete all expenses of this group
+    await Expense.deleteMany({ group: groupId }).session(session);
+
+    // 🔥 Delete all settlements of this group
+    await Settlement.deleteMany({ group: groupId }).session(session);
+
+    // 🔥 Delete the group itself
+    await Group.findByIdAndDelete(groupId).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      msg: "Group and related data deleted successfully"
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(err);
+    res.status(500).json({ msg: "Failed to delete group" });
+  }
+});
+
 
 
 module.exports = router;

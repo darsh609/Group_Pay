@@ -29,3 +29,22 @@ console.log(userId);
 console.log(settlements);
   res.json(settlements);
 };
+// DELETE settlement
+exports.deleteSettlement = async (req, res) => {
+  const { settlementId } = req.params;
+
+  const settlement = await Settlement.findById(settlementId);
+
+  if (!settlement) {
+    return res.status(404).json({ msg: "Settlement not found" });
+  }
+
+  // 🔐 Authorization: only creator (from) can delete
+  if (settlement.from.toString() !== req.user.toString()) {
+    return res.status(403).json({ msg: "Not authorized to delete this settlement" });
+  }
+
+  await settlement.deleteOne();
+
+  res.json({ msg: "Settlement deleted successfully" });
+};

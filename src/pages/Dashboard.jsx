@@ -4,6 +4,9 @@ import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ArrowDownLeft, Users, Plus, TrendingUp } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 export default function Dashboard() {
   const [groups, setGroups] = useState([]);
@@ -12,6 +15,52 @@ export default function Dashboard() {
   const [groupName, setGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const navigate = useNavigate();
+const handleDeleteGroup = async (e, groupId) => {
+  e.stopPropagation(); // prevent opening group
+
+  toast.warn(
+    ({ closeToast }) => (
+      <div className="flex flex-col gap-2">
+        <p className="font-semibold">
+          Delete this group?
+        </p>
+        <p className="text-sm">
+          This will delete the group, expenses & settlements.
+        </p>
+
+        <div className="flex gap-3 mt-2">
+          <button
+            className="px-3 py-1 bg-red-500 text-white rounded"
+            onClick={async () => {
+              try {
+                await api.delete(`/groups/${groupId}`);
+                setGroups(prev => prev.filter(g => g._id !== groupId));
+                toast.success("Group deleted successfully");
+              } catch (err) {
+                toast.error(
+                  err.response?.data?.msg || "Failed to delete group"
+                );
+              } finally {
+                closeToast();
+              }
+            }}
+          >
+            Delete
+          </button>
+
+          <button
+            className="px-3 py-1 bg-gray-300 rounded"
+            onClick={closeToast}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ),
+    { autoClose: false }
+  );
+};
+
 
   useEffect(() => {
     fetchGroups();
@@ -84,7 +133,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-            CredResolve Dashboard
+            GroupPay Dashboard
           </h1>
           <p className="text-slate-400">
             Manage your expense sharing groups and track balances
@@ -251,26 +300,38 @@ export default function Dashboard() {
             <div className="grid md:grid-cols-3 gap-6">
               {groups.map(group => (
                 <div
-                  key={group._id}
-                  onClick={() => navigate(`/groups/${group._id}`)}
-                  className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition cursor-pointer backdrop-blur-sm group"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="bg-purple-500/20 p-3 rounded-xl group-hover:bg-purple-500/30 transition">
-                      <Users className="w-6 h-6 text-purple-400" />
-                    </div>
-                  </div>
-                  <h4 className="text-xl font-semibold mb-2 group-hover:text-purple-400 transition">
-                    {group.name}
-                  </h4>
-                  <p className="text-slate-400 text-sm">
-                    {group.members.length} member{group.members.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
+  key={group._id}
+  onClick={() => navigate(`/groups/${group._id}`)}
+  className="relative bg-slate-900/50 border border-slate-800 rounded-2xl p-6 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition cursor-pointer backdrop-blur-sm group"
+>
+  {/* DELETE ICON */}
+  <button
+    onClick={(e) => handleDeleteGroup(e, group._id)}
+    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition text-red-400 hover:text-red-500"
+    title="Delete Group"
+  >
+    <Trash2 className="w-5 h-5" />
+  </button>
+
+  <div className="flex items-start justify-between mb-3">
+    <div className="bg-purple-500/20 p-3 rounded-xl group-hover:bg-purple-500/30 transition">
+      <Users className="w-6 h-6 text-purple-400" />
+    </div>
+  </div>
+
+  <h4 className="text-xl font-semibold mb-2 group-hover:text-purple-400 transition">
+    {group.name}
+  </h4>
+
+  <p className="text-slate-400 text-sm">
+    {group.members.length} member{group.members.length !== 1 ? "s" : ""}
+  </p>
+</div>
               ))}
             </div>
           )}
         </div>
+
 
       </div>
     </div>
