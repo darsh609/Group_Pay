@@ -20,17 +20,41 @@ const [groupName, setGroupName] = useState("");
   const [amount, setAmount] = useState("");
   const [paidBy, setPaidBy] = useState("");
   const [splitType, setSplitType] = useState("EQUAL");
-const handleDeleteExpense = async (expenseId) => {
-  const ok = window.confirm("Delete this expense?");
-  if (!ok) return;
 
-  try {
-    await api.delete(`/expenses/${expenseId}`);
-    setExpenses(prev => prev.filter(e => e._id !== expenseId));
-  } catch (err) {
-    alert("Failed to delete expense");
-  }
+
+const handleDeleteExpense = (expenseId) => {
+  toast(
+    ({ closeToast }) => (
+      <div>
+        <p className="font-medium">Delete this expense?</p>
+        <div className="flex gap-3 mt-2">
+          <button
+            className="text-sm text-gray-600"
+            onClick={closeToast}
+          >
+            Cancel
+          </button>
+          <button
+            className="text-sm text-red-600"
+            onClick={async () => {
+              try {
+                await api.delete(`/expenses/${expenseId}`);
+                setExpenses(prev => prev.filter(e => e._id !== expenseId));
+                closeToast();
+              } catch {
+                alert("Failed to delete expense");
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ),
+    { autoClose: false }
+  );
 };
+
 
   const toggleSplitUser = (userId) => {
     // Prevent unchecking if user is the payer
